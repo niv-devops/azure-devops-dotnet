@@ -23,9 +23,14 @@ steps:
     dotnet pack ./HelloWorld/HelloWorld.csproj --configuration Release --output $(Build.ArtifactStagingDirectory)
   displayName: 'Pack NuGet Package'
 
-- script: |
-    dotnet nuget push $(Build.ArtifactStagingDirectory)/*.nupkg --source "https://pkgs.dev.azure.com/nivz267/_packaging/goofy/nuget/v3/index.json" --api-key az $(Build.ArtifactStagingDirectory)\*.nupkg
-  displayName: 'Publish NuGet Package to Azure Artifacts'
+- task: UniversalPackages@0
+  displayName: Publish Universal Package to Azure Artifacts
+  inputs:
+    command: publish
+    publishDirectory: '$(Build.ArtifactStagingDirectory)'
+    vstsFeedPublish: 'hello_world/goofy'
+    vstsFeedPackagePublish: 'helloworld-package'
+    versionOption: patch
 
 - script: |
     rm -rf $(Build.ArtifactStagingDirectory)
