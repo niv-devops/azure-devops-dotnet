@@ -23,19 +23,18 @@ steps:
     dotnet pack ./HelloWorld/HelloWorld.csproj --configuration Release --output $(Build.ArtifactStagingDirectory)
   displayName: 'Pack NuGet Package'
 
-- task: UniversalPackages@0
-  displayName: Publish Universal Package to Azure Artifacts
+- task: NuGetCommand@2
   inputs:
-    command: publish
-    publishDirectory: '$(Build.ArtifactStagingDirectory)'
-    vstsFeedPublish: 'hello_world/goofy'
-    vstsFeedPackagePublish: 'helloworld-package'
-    versionOption: patch
+    command: 'push'
+    publishVstsFeed: 'hello_world/goofy'
+    packageFile: '$(Build.ArtifactStagingDirectory)/*.nupkg'
+    versioningScheme: 'byBuildNumber'
+  displayName: 'Publish NuGet Package to Azure Artifacts'
+
+- script: |
+    echo "Artifact Version: $(Build.BuildId)"
+  displayName: 'Print Artifact Version'
 
 - script: |
     rm -rf $(Build.ArtifactStagingDirectory)
   displayName: 'Clean Up Artifact'
-
-- script: |
-    echo "Artifact version: $(Build.BuildNumber)"
-  displayName: 'Print Artifact Version'
