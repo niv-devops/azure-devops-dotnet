@@ -12,11 +12,15 @@ steps:
     installationPath: $(Agent.ToolsDirectory)/dotnet
 
 - script: |
+    dotnet restore ./HelloWorld/HelloWorld.csproj
+  displayName: 'Restore dependencies'
+
+- script: |
     dotnet build ./HelloWorld/HelloWorld.csproj --configuration Release
   displayName: 'Build Project'
 
 - script: |
-    dotnet pack --configuration Release --output $(Build.ArtifactStagingDirectory)
+    dotnet pack ./HelloWorld/HelloWorld.csproj --configuration Release --output $(Build.ArtifactStagingDirectory)
   displayName: 'Pack NuGet Package'
 
 - task: NuGetCommand@2
