@@ -29,7 +29,7 @@ jobs:
       
     - task: SonarQubePrepare@6
       inputs:
-        SonarQube: 'YourSonarQubeServiceConnection'  # Your SonarQube connection
+        SonarQube: 'SonarQube'
         scannerMode: 'MSBuild'
         projectKey: 'nivz267_hello_world'
         projectName: 'hello_world'
@@ -54,9 +54,9 @@ jobs:
     - task: DotNetCoreCLI@2
       inputs:
         command: 'pack'
-        projects: '$(project)'
+        projects: './HelloWorld/HelloWorld.csproj'
         versioningScheme: 'byBuildNumber' 
-        arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory) /p:PackageId=AzureHelloWorld.$(buildVersion)'
+        arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
       displayName: 'Pack project with version $(buildVersion)'
 
     - script: |
@@ -66,35 +66,14 @@ jobs:
     - task: NuGetCommand@2
       inputs:
         command: 'push'
-        publishVstsFeed: 'your-feed-id'  # Replace with your actual feed ID
+        publishVstsFeed: 'goofy'
         packageFile: '$(Build.ArtifactStagingDirectory)/*.nupkg'
-        versioningScheme: 'byBuildNumber'  # Automatically handle version increment
+        versioningScheme: 'byBuildNumber'
       displayName: 'Publish NuGet Package to Azure Artifacts'
 
     - script: |
-        VERSION=$(Build.BuildId)  # Or you can calculate a version based on the branch
-        TAG_NAME="dev.$VERSION"
-        echo "Tagging with: $TAG_NAME"
-        git tag $TAG_NAME
-        git push origin $TAG_NAME
-      displayName: 'Tag the Build with Branch Name and Version'
-
-    - script: |
-        echo "Version: $(Build.BuildId)"  # You can extract a more meaningful version from your .csproj if needed
+        echo "Version: $(Build.BuildId) $(buildVersion)"
       displayName: 'Print Version to Console'
-      
-    - task: SendEmail@1
-      condition: always()  # Send email on completion regardless of success/failure
-      inputs:
-        to: 'you@example.com'  # Replace with recipient email
-        subject: 'Azure DevOps Pipeline Status: $(Build.DefinitionName) - $(Build.BuildId)'
-        body: |
-          The pipeline has completed with status: $(Build.Status)
-          Build ID: $(Build.BuildId)
-          Result: $(Build.Result)
-        smtpServer: 'smtp.example.com'  # Set your SMTP server or use an external service
-        smtpUser: 'username'  # Your SMTP username
-        smtpPassword: 'password'  # Your SMTP password
 
   - job: MainTasks
     displayName: 'Main Branch Tasks: Build, Pack, and Publish Project'
