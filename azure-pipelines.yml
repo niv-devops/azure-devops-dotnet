@@ -24,7 +24,7 @@ steps:
   displayName: 'Pack NuGet Package'
 
 - script: |
-    dotnet nuget push $(Build.ArtifactStagingDirectory)/*.nupkg --source "https://pkgs.dev.azure.com/nivz267/_packaging/goofy/nuget/v3/index.json" --api-key $(System.AccessToken)
+    dotnet nuget push $(Build.ArtifactStagingDirectory)/*.nupkg --source "https://pkgs.dev.azure.com/nivz267/_packaging/goofy/nuget/v3/index.json" --api-key az $(Build.ArtifactStagingDirectory)\*.nupkg
   displayName: 'Publish NuGet Package to Azure Artifacts'
 
 - script: |
