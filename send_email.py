@@ -37,3 +37,19 @@ try:
     print("Email sent successfully!")
 except Exception as e:
     print(f"Error sending email: {e}")
+
+"""
+- script: |
+    SUBJECT="Azure DevOps Pipeline Status: $(Build.DefinitionName) - $(Build.BuildId)"
+    BODY="The build pipeline has completed with status: $(Build.Status)\n\n"
+    BODY="${BODY}Pipeline Name: $(Build.DefinitionName)\n"
+    BODY="${BODY}Build ID: $(Build.BuildId)\n"
+    BODY="${BODY}Branch: $(Build.SourceBranchName)\n"
+    BODY="${BODY}Build Status: $(Build.Status)\n"
+    MAIL="goofygitlab@gmail.com"  
+    echo -e "Subject: $SUBJECT\n\n$BODY" | \
+    curl --url 'smtp://smtp.gmail.com:587' --ssl-reqd \
+     --mail-from "$MAIL" --mail-rcpt "$MAIL" \
+     --user "$MAIL:${GMAIL_PASSWORD}"
+  displayName: 'Send Pipeline Status Email'
+"""
