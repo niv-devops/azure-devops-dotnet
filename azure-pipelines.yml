@@ -11,6 +11,8 @@ jobs:
   - job: DevTasks
     displayName: 'Dev Branch Tasks: SonarQube, NuGet, and Publish'
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/dev'))
+    variables:
+      artifactVersion: "1.0.$(Build.BuildId)-$(Build.SourceBranchName)"
     steps:
     - checkout: self
       fetchDepth: 0
@@ -31,6 +33,7 @@ jobs:
       inputs:
         SonarQube: 'SonarQube'
         scannerMode: 'MSBuild'
+        organization: 'nivz267'
         projectKey: 'nivz267_hello_world'
         projectName: 'hello_world'
 
@@ -51,36 +54,22 @@ jobs:
       inputs:
         jdkversion: 'JAVA_HOME_21_X64'
 
-    - script: |
-        BRANCH_NAME=$(Build.SourceBranchName)
-        BUILD_NUMBER=$(Build.BuildId)
-        VERSION="$BRANCH_NAME.$BUILD_NUMBER"
-        echo "##vso[task.setvariable variable=artifactVersion]$VERSION"
-        echo "Tagging the repository with version $VERSION"
-        git tag -a $VERSION -m "Version $VERSION"
-        git push origin $VERSION
-      displayName: 'Tag the Repository with Version'
-
     - task: DotNetCoreCLI@2
       inputs:
         command: 'pack'
         projects: './HelloWorld/HelloWorld.csproj'
-        versioningScheme: 'off' 
-        arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory) /p:PackageVersion=$(artifactVersion)'
-      displayName: 'Pack project with version $(artifactVersion)'
-
-    - task: NuGetCommand@2
-      inputs:
-        command: 'push'
-        publishVstsFeed: 'goofy'
-        packageFile: '$(Build.ArtifactStagingDirectory)/*.nupkg'
-        versioningScheme: 'off'
-        versionPublish: $(artifactVersion)
-      displayName: 'Publish NuGet Package to Azure Artifacts'
+        versioningScheme: 'byEnvVar'
+        versionEnvVar: artifactVersion
+        arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)'
+      displayName: 'Pack The Project'
 
     - script: |
-        echo "Artifact Version: versionPublish: $(artifactVersion)"
-      displayName: 'Print Version to Console'
+        dotnet nuget push $(Build.ArtifactStagingDirectory)/*.nupkg --source "https://pkgs.dev.azure.com/nivz267/hello_world/_packaging/goofy/nuget/v3/index.json" --api-key $(System.AccessToken)
+      displayName: 'Push NuGet Package to Azure Artifacts'
+
+    - script: |
+        echo "Artifact Version: $(artifactVersion)"
+      displayName: 'Print Artifact Version'
 
   - job: MainTasks
     displayName: 'Main Branch Tasks: Build, Pack, and Publish Project'
