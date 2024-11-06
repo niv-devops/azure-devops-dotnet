@@ -71,17 +71,29 @@ jobs:
         echo "Artifact Version: $(artifactVersion)"
       displayName: 'Print Artifact Version'
 
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '3.12'
+        addToPath: true
+
     - script: |
-        SUBJECT="Azure DevOps Pipeline Status: $(Build.DefinitionName) - $(Build.BuildId)"
-        BODY="${BODY}Pipeline Name: $(Build.DefinitionName)\n"
-        BODY="${BODY}Build ID: $(Build.BuildId)\n"
-        BODY="${BODY}Branch: $(Build.SourceBranchName)\n"
-        MAIL="goofygitlab@gmail.com"  
-        echo -e "Subject: $SUBJECT\n\n$BODY" | \
-        curl --url 'smtp://smtp.gmail.com:587' --ssl-reqd \
-         --mail-from "$MAIL" --mail-rcpt "$MAIL" \
-         --user "$MAIL:${GMAIL_PASSWORD}"
-      displayName: 'Send Pipeline Status Email'
+        pip install secure-smtplib
+      displayName: 'Install Python SMTP Library'
+
+    - script: |
+        echo "##vso[task.setvariable variable=BUILD_STATUS]$(Build.Status)"
+        echo "##vso[task.setvariable variable=BUILD_DEFINITION]$(Build.DefinitionName)"
+        echo "##vso[task.setvariable variable=BUILD_ID]$(Build.BuildId)"
+        echo "##vso[task.setvariable variable=BUILD_BRANCH]$(Build.SourceBranchName)"
+      env:
+        GMAIL_PASSWORD: $(GMAIL_PASSWORD)
+      displayName: 'Set Environment Variables'
+
+    - task: PythonScript@0
+      inputs:
+        scriptPath: './send_email.py'
+        pythonInterpreter: 'python3'
+        displayName: 'Send Pipeline Status Email'
 
   - job: MainTasks
     displayName: 'Main Branch Tasks: Build, Pack, and Publish Project'
