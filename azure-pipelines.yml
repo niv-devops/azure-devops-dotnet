@@ -31,6 +31,7 @@ jobs:
       inputs:
         SonarQube: 'SonarQube'
         scannerMode: 'MSBuild'
+        organization: 'nivz267'
         projectKey: 'nivz267_hello_world'
         projectName: 'hello_world'
 
