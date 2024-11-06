@@ -12,7 +12,7 @@ jobs:
     displayName: 'Dev Branch Tasks: SonarQube, NuGet, and Publish'
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/dev'))
     variables:
-      artifactVersion: "$1.0.(Build.BuildId).$(Build.SourceBranchName)"
+      artifactVersion: "$1.0.$(Build.BuildId).$(Build.SourceBranchName)"
     steps:
     - checkout: self
       fetchDepth: 0
