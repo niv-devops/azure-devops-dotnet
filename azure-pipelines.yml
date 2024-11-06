@@ -91,18 +91,8 @@ jobs:
         scriptPath: './send_email.py'
         pythonInterpreter: '$(Build.SourcesDirectory)/.venv/bin/python'
         displayName: 'Send Pipeline Status Email'
-
-    - script: |
-        SUBJECT="Azure DevOps Pipeline Status: $(Build.DefinitionName) - $(Build.BuildId)"
-        BODY="${BODY}Pipeline Name: $(Build.DefinitionName)\n"
-        BODY="${BODY}Build ID: $(Build.BuildId)\n"
-        BODY="${BODY}Branch: $(Build.SourceBranchName)\n"
-        MAIL="goofygitlab@gmail.com"  
-        echo -e "Subject: $SUBJECT\n\n$BODY" | \
-        curl --url 'smtp://smtp.gmail.com:587' --ssl-reqd \
-          --mail-from "$MAIL" --mail-rcpt "$MAIL" \
-          --user "$MAIL:${{ secrets.GMAIL_APP_PASSWORD }}"
-      displayName: 'Send Pipeline Status Email'
+      env:
+        GMAIL_APP_PASSWORD: $(GMAIL_PASSWORD)
 
   - job: MainTasks
     displayName: 'Main Branch Tasks: Build, Pack, and Publish Project'
