@@ -71,7 +71,7 @@ jobs:
     - task: DotNetCoreCLI@2
       inputs:
         command: 'push'
-        publishFeed: 'goofy'
+        publishFeed: 'https://pkgs.dev.azure.com/nivz267/_packaging/goofy/nuget/v3/index.json'
         packageFile: '$(Build.ArtifactStagingDirectory)/*.nupkg'
         versionPublish: $(artifactVersion)
       displayName: 'Publish NuGet Package to Azure Artifacts'
