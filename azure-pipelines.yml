@@ -72,11 +72,11 @@ jobs:
       displayName: 'Print Artifact Version'
 
     - script: |
-        BODY="The build pipeline has completed with status: ${Build.Status}\n\n"
-        BODY="${BODY}Pipeline Name: ${Build.DefinitionName}\n"
-        BODY="${BODY}Build ID: ${Build.BuildId}\n"
-        BODY="${BODY}Branch: ${Build.SourceBranchName}\n"
-        BODY="${BODY}Build Status: ${Build.Status}\n"
+        BODY="The build pipeline has completed with status: $(Build.Status)\n\n"
+        BODY="${BODY}Pipeline Name: $(Build.DefinitionName)\n"
+        BODY="${BODY}Build ID: $(Build.BuildId)\n"
+        BODY="${BODY}Branch: $(Build.SourceBranchName)\n"
+        BODY="${BODY}Build Status: $(Build.Status)\n"
         MAIL="goofygitlab@gmail.com"  
         echo -e "Subject: $SUBJECT\n\n$BODY" | \
         curl --url 'smtp://smtp.gmail.com:587' --ssl-reqd \
