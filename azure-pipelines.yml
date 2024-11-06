@@ -42,8 +42,9 @@ jobs:
       displayName: 'Restore dependencies'
 
     - script: |
+        chmod +x /home/niv/azure_agent/_work/_tool/NuGet/4.9.6/x64/nuget.exe
         nuget.exe restore
-      displayName: 'Restore packages'
+      displayName: 'Restore NuGet Packages'
 
     - task: DotNetCoreCLI@2
       inputs:
