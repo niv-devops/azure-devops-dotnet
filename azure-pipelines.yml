@@ -69,7 +69,7 @@ jobs:
       displayName: 'Pack project with version $(artifactVersion)'
 
     - script: |
-        dotnet nuget push $(Build.ArtifactStagingDirectory)/*.nupkg --source "https://pkgs.dev.azure.com/nivz267/_packaging/goofy/nuget/v3/index.json" --api-key $(System.AccessToken)
+        dotnet nuget push $(Build.ArtifactStagingDirectory)/*.nupkg --source "https://pkgs.dev.azure.com/nivz267/hello_world/_packaging/goofy/nuget/v3/index.json" --api-key $(System.AccessToken)
       displayName: 'Push NuGet Package to Azure Artifacts'
 
     - script: |
