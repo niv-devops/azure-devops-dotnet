@@ -41,6 +41,10 @@ jobs:
         projects: './HelloWorld/HelloWorld.csproj'
       displayName: 'Restore dependencies'
 
+    - script: |
+        nuget.exe restore
+      displayName: 'Restore packages'
+
     - task: DotNetCoreCLI@2
       inputs:
         command: 'build'
@@ -68,17 +72,13 @@ jobs:
         arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory) /p:PackageVersion=$(artifactVersion)'
       displayName: 'Pack project with version $(artifactVersion)'
 
-    - task: DotNetCoreCLI@2
-      inputs:
-        command: 'push'
-        publishFeed: 'https://pkgs.dev.azure.com/nivz267/_packaging/goofy/nuget/v3/index.json'
-        packageFile: '$(Build.ArtifactStagingDirectory)/*.nupkg'
-        versionPublish: $(artifactVersion)
-      displayName: 'Publish NuGet Package to Azure Artifacts'
+    - script: |
+        nuget.exe push -Source "goofy" -ApiKey az $(Build.ArtifactStagingDirectory)/*.nupkg
+      displayName: 'Push NuGet package to Azure Artifacts'
 
     - script: |
         echo "Artifact Version: $(artifactVersion)"
-      displayName: 'Print Version to Console'
+      displayName: 'Print Artifact Version'
 
   - job: MainTasks
     displayName: 'Main Branch Tasks: Build, Pack, and Publish Project'
