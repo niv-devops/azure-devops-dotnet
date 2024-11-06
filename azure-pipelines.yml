@@ -41,11 +41,6 @@ jobs:
         projects: './HelloWorld/HelloWorld.csproj'
       displayName: 'Restore dependencies'
 
-    - script: |
-        chmod +x /home/niv/azure_agent/_work/_tool/NuGet/4.9.6/x64/nuget.exe
-        nuget.exe restore
-      displayName: 'Restore NuGet Packages'
-
     - task: DotNetCoreCLI@2
       inputs:
         command: 'build'
@@ -74,8 +69,8 @@ jobs:
       displayName: 'Pack project with version $(artifactVersion)'
 
     - script: |
-        nuget.exe push -Source "goofy" -ApiKey az $(Build.ArtifactStagingDirectory)/*.nupkg
-      displayName: 'Push NuGet package to Azure Artifacts'
+        dotnet nuget push $(Build.ArtifactStagingDirectory)/*.nupkg --source "https://pkgs.dev.azure.com/nivz267/_packaging/goofy/nuget/v3/index.json" --api-key $(System.AccessToken)
+      displayName: 'Push NuGet Package to Azure Artifacts'
 
     - script: |
         echo "Artifact Version: $(artifactVersion)"
