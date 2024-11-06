@@ -60,6 +60,10 @@ jobs:
         echo "Tagging the artifact with version $VERSION"
       displayName: 'Tag the Repository with Version'
 
+    - script: |
+        echo "Artifact Version: $(artifactVersion)"
+      displayName: 'Print Artifact Version'
+
     - task: DotNetCoreCLI@2
       inputs:
         command: 'pack'
