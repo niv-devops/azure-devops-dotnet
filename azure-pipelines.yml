@@ -72,6 +72,8 @@ jobs:
       displayName: 'Print Artifact Version'
 
     - script: |
+        python3 -m venv $(Build.SourcesDirectory)/.venv
+        source $(Build.SourcesDirectory)/.venv/bin/activate
         pip install secure-smtplib
       displayName: 'Install Python SMTP Library'
 
@@ -87,7 +89,7 @@ jobs:
     - task: PythonScript@0
       inputs:
         scriptPath: './send_email.py'
-        pythonInterpreter: 'python3'
+        pythonInterpreter: '$(Build.SourcesDirectory)/.venv/bin/python'
         displayName: 'Send Pipeline Status Email'
 
   - job: MainTasks
