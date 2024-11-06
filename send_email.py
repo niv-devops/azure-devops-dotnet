@@ -38,7 +38,7 @@ try:
 except Exception as e:
     print(f"Error sending email: {e}")
 
-"""
+""" for azure devops
 - script: |
     SUBJECT="Azure DevOps Pipeline Status: $(Build.DefinitionName) - $(Build.BuildId)"
     BODY="The build pipeline has completed with status: $(Build.Status)\n\n"
