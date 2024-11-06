@@ -57,9 +57,7 @@ jobs:
         BUILD_NUMBER=$(Build.BuildId)
         VERSION="$BRANCH_NAME.$BUILD_NUMBER"
         echo "##vso[task.setvariable variable=artifactVersion]$VERSION"
-        echo "Tagging the repository with version $VERSION"
-        git tag -a $VERSION -m "Version $VERSION"
-        git push origin $VERSION
+        echo "Tagging the artifact with version $VERSION"
       displayName: 'Tag the Repository with Version'
 
     - task: DotNetCoreCLI@2
@@ -80,7 +78,7 @@ jobs:
       displayName: 'Publish NuGet Package to Azure Artifacts'
 
     - script: |
-        echo "Artifact Version: versionPublish: $(artifactVersion)"
+        echo "Artifact Version: $(artifactVersion)"
       displayName: 'Print Version to Console'
 
   - job: MainTasks
