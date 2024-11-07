@@ -13,7 +13,7 @@ jobs:
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/dev'))
     variables:
       artifactVersion: "1.0.$(Build.BuildId)-$(Build.SourceBranchName)"
-      - group: pipeline
+      - group: PIPELINE
     steps:
     - checkout: self
       fetchDepth: 0
