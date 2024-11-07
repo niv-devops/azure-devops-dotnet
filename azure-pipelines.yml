@@ -13,6 +13,7 @@ jobs:
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/dev'))
     variables:
     - group: PIPELINE
+    variables:
       artifactVersion: "1.0.$(Build.BuildId)-$(Build.SourceBranchName)"
     steps:
     - checkout: self
