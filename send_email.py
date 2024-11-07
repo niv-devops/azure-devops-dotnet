@@ -7,6 +7,7 @@ build_status = os.getenv('BUILD_STATUS', 'Unknown')
 build_definition = os.getenv('BUILD_DEFINITION', 'Unknown')
 build_id = os.getenv('BUILD_ID', 'Unknown')
 build_branch = os.getenv('BUILD_BRANCH', 'Unknown')
+build_uri = os.getenv('Build.BuildUri' 'Unknown')
 
 sender_email = "goofygitlab@gmail.com"
 receiver_email = "goofygitlab@gmail.com"
@@ -19,6 +20,7 @@ The build pipeline has completed with status: {build_status}
 Pipeline Name: {build_definition}
 Build ID: {build_id}
 Branch: {build_branch}
+More Detailes: {build_uri}
 """
 
 msg = MIMEMultipart()
@@ -41,15 +43,17 @@ except Exception as e:
 """ for azure devops
 - script: |
     SUBJECT="Azure DevOps Pipeline Status: $(Build.DefinitionName) - $(Build.BuildId)"
-    BODY="The build pipeline has completed with status: $(Build.Status)\n\n"
+    BODY="On $(Build.Repository.Provider) - $(Build.Repository.Name) Repository:"
+    BODY="${BODY}The build pipeline has completed with status: $(Agent.JobStatus)\n\n"
     BODY="${BODY}Pipeline Name: $(Build.DefinitionName)\n"
-    BODY="${BODY}Build ID: $(Build.BuildId)\n"
     BODY="${BODY}Branch: $(Build.SourceBranchName)\n"
-    BODY="${BODY}Build Status: $(Build.Status)\n"
-    MAIL="goofygitlab@gmail.com"  
-    echo -e "Subject: $SUBJECT\n\n$BODY" | \
-    curl --url 'smtp://smtp.gmail.com:587' --ssl-reqd \
-     --mail-from "$MAIL" --mail-rcpt "$MAIL" \
-     --user "$MAIL:${GMAIL_PASSWORD}"
+    BODY="${BODY}Build URI: $(Build.BuildUri)\n"
+    BODY="${BODY}Go To Repo: $(Build.Repository.Uri)\n"
+
+    curl --url 'smtp://smtp.gmail.com:587' \
+            --ssl-reqd \
+            --mail-from "$(GMAIL_USER)" --mail-rcpt "$(GMAIL_USER)" \
+            --upload-file <(echo -e "Subject: $SUBJECT\n\n$BODY") \
+            --user "$(GMAIL_USER):$(GMAIL_PASSWORD)" --insecure
   displayName: 'Send Pipeline Status Email'
 """
