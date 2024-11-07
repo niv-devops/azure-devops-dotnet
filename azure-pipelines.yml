@@ -24,11 +24,13 @@ jobs:
 
     - script: |
         echo "This step will fail"
-        exit 1
+        exit 1  # Force failure
       displayName: 'Intentional Failure Step'
-      condition: always()
-      script: |
+
+    - script: |
         bash ./scripts/mail_logs.sh
+      displayName: 'Send Logs and Email'
+      condition: always()
 
     - task: UseDotNet@2
       inputs:
