@@ -68,6 +68,7 @@ jobs:
         arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)'
       displayName: 'Pack The Project'
 
+
     - script: |
         dotnet nuget push $(Build.ArtifactStagingDirectory)/*.nupkg --source "https://pkgs.dev.azure.com/nivz267/hello_world/_packaging/goofy/nuget/v3/index.json" --api-key $(System.AccessToken)
       displayName: 'Push NuGet Package to Azure Artifacts'
@@ -77,12 +78,25 @@ jobs:
       displayName: 'Print Artifact Version'
 
     - script: |
+        bash ./scripts/mail_logs.sh
+      displayName: 'Send Logs and Email'
+      condition: always()
+
+    - script: |
         SUBJECT="Azure DevOps Pipeline Status: $(Build.DefinitionName) - $(Build.BuildId)"
         BODY="On $(Build.Repository.Provider) - $(Build.Repository.Name) Repository:"
         BODY="${BODY}The build pipeline has completed with status: $(Agent.JobStatus)\n\n"
         BODY="${BODY}Pipeline Name: $(Build.DefinitionName)\n"
         BODY="${BODY}Branch: $(Build.SourceBranchName)\n"
         BODY="${BODY}Go To Repo: $(Build.Repository.Uri)\n"
+
+        if [ -f "$(Build.ArtifactStagingDirectory)/build_logs.txt" ]; then
+          LOG_CONTENT=$(cat $(Build.ArtifactStagingDirectory)/build_logs.txt)
+          BODY="${BODY}\n\nBuild Logs:\n$LOG_CONTENT"
+        else
+          BODY="${BODY}\n\nNo logs found."
+        fi
+        
         curl -v --url 'smtp://smtp.gmail.com:587' --ssl-reqd \
             --mail-from "$(GMAIL_USER)" --mail-rcpt "$(GMAIL_USER)" \
             --upload-file <(echo -e "Subject: $SUBJECT\n\n$BODY") \
