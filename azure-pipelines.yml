@@ -22,6 +22,14 @@ jobs:
     - checkout: self
       fetchDepth: 0
 
+    - script: |
+        echo "This step will fail"
+        exit 1
+      displayName: 'Intentional Failure Step'
+      condition: always()
+      script: |
+        bash ./scripts/mail_logs.sh
+
     - task: UseDotNet@2
       inputs:
         packageType: 'sdk'
@@ -83,6 +91,12 @@ jobs:
         BODY="${BODY}Pipeline Name: $(Build.DefinitionName)\n"
         BODY="${BODY}Branch: $(Build.SourceBranchName)\n"
         BODY="${BODY}Go To Repo: $(Build.Repository.Uri)\n"
+
+        if [ -f "$(Build.ArtifactStagingDirectory)/build_logs.txt" ]; then
+          LOG_CONTENT=$(cat $(Build.ArtifactStagingDirectory)/build_logs.txt)
+          BODY="${BODY}\n\nBuild Logs:\n$LOG_CONTENT"
+        fi
+        
         curl -v --url 'smtp://smtp.gmail.com:587' --ssl-reqd \
             --mail-from "$(GMAIL_USER)" --mail-rcpt "$(GMAIL_USER)" \
             --upload-file <(echo -e "Subject: $SUBJECT\n\n$BODY") \
