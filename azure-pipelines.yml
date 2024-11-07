@@ -13,6 +13,7 @@ jobs:
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/dev'))
     variables:
     - group: PIPELINE
+    - system.debug: 'true'
     - name: artifactVersion
       value: "1.0.$(Build.BuildId)-$(Build.SourceBranchName)"
 
@@ -80,13 +81,13 @@ jobs:
         BODY="${BODY}The build pipeline has completed with status: $(Agent.JobStatus)\n\n"
         BODY="${BODY}Pipeline Name: $(Build.DefinitionName)\n"
         BODY="${BODY}Branch: $(Build.SourceBranchName)\n"
-        BODY="${BODY}Build URI: $(Build.BuildUri)\n"
         BODY="${BODY}Go To Repo: $(Build.Repository.Uri)\n"
         curl -v --url 'smtp://smtp.gmail.com:587' --ssl-reqd \
             --mail-from "$(GMAIL_USER)" --mail-rcpt "$(GMAIL_USER)" \
             --upload-file <(echo -e "Subject: $SUBJECT\n\n$BODY") \
             --user "$(GMAIL_USER):$(GMAIL_PASSWORD)" --insecure
       displayName: 'Send Pipeline Status Email'
+      condition: always()
 
   - job: MainTasks
     displayName: 'Main Branch Tasks: Build, Pack, and Publish Project'
