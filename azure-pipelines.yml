@@ -27,11 +27,6 @@ jobs:
         exit 1  # Force failure
       displayName: 'Intentional Failure Step'
 
-    - script: |
-        bash ./scripts/mail_logs.sh
-      displayName: 'Send Logs and Email'
-      condition: always()
-
     - task: UseDotNet@2
       inputs:
         packageType: 'sdk'
@@ -78,6 +73,7 @@ jobs:
         arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)'
       displayName: 'Pack The Project'
 
+
     - script: |
         dotnet nuget push $(Build.ArtifactStagingDirectory)/*.nupkg --source "https://pkgs.dev.azure.com/nivz267/hello_world/_packaging/goofy/nuget/v3/index.json" --api-key $(System.AccessToken)
       displayName: 'Push NuGet Package to Azure Artifacts'
@@ -85,6 +81,11 @@ jobs:
     - script: |
         echo "Artifact Version: $(artifactVersion)"
       displayName: 'Print Artifact Version'
+
+    - script: |
+        bash ./scripts/mail_logs.sh
+      displayName: 'Send Logs and Email'
+      condition: always()
 
     - script: |
         SUBJECT="Azure DevOps Pipeline Status: $(Build.DefinitionName) - $(Build.BuildId)"
@@ -97,6 +98,8 @@ jobs:
         if [ -f "$(Build.ArtifactStagingDirectory)/build_logs.txt" ]; then
           LOG_CONTENT=$(cat $(Build.ArtifactStagingDirectory)/build_logs.txt)
           BODY="${BODY}\n\nBuild Logs:\n$LOG_CONTENT"
+        else
+          BODY="${BODY}\n\nNo logs found."
         fi
         
         curl -v --url 'smtp://smtp.gmail.com:587' --ssl-reqd \
